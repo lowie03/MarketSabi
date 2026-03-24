@@ -17,3 +17,6 @@ MarketSabi is a digital inclusion tool designed for Nigerian market traders who 
 
 ## Impact
 This project addresses the **Financial Inclusion** pillar by helping "invisible" traders build a verifiable digital history, making them eligible for formal banking services and credit.
+
+## Live Demo
+You can interact with the live MarketSabi bot on Telegram here: [https://t.me/Yamskibot]
