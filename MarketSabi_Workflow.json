@@ -1,0 +1,777 @@
+{
+  "name": "3mtt",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "5214968346",
+        "text": "Welcome! Which language you want make I use follow you talk?",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "English 🇬🇧",
+                    "additionalFields": {
+                      "callback_data": "lang_en"
+                    }
+                  },
+                  {
+                    "text": "Pidgin 🇳🇬",
+                    "additionalFields": {
+                      "callback_data": "lang_pidgin"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        864
+      ],
+      "id": "acff1946-ff18-47c4-a0fb-d3435711b703",
+      "name": "Send a text message1",
+      "webhookId": "2dd4de7e-5e2b-44e5-bf1b-753711fe8d61",
+      "credentials": {
+        "telegramApi": {
+          "id": "EMjJGAUQG0Hbgoea",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        1376
+      ],
+      "id": "c3dc5bf8-33d1-48d2-9874-a2bb0b49c46a",
+      "name": "Telegram Trigger1",
+      "webhookId": "8c200ba4-8fcf-40b7-b262-4cffd61f9e6d",
+      "credentials": {
+        "telegramApi": {
+          "id": "EMjJGAUQG0Hbgoea",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        576
+      ],
+      "id": "6ebef2ec-82cd-42f5-bed5-17a5e5edaad9",
+      "name": "Telegram Trigger2",
+      "webhookId": "1d7a9130-8411-43e1-9344-63efaa1a3303",
+      "credentials": {
+        "telegramApi": {
+          "id": "EMjJGAUQG0Hbgoea",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 35518771,
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE/edit#gid=35518771"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Chat ID",
+              "lookupValue": "={{ $('Telegram Trigger2').item.json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        576
+      ],
+      "id": "34c52fff-ccc9-4691-9460-c80e39d24804",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "22aoX0pIQ8VTXQd6",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "797c8c61-8cc3-456b-bf03-7ec702811e7a",
+              "leftValue": "={{ $node[\"Get row(s) in sheet\"].json[\"Chat ID\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        768,
+        576
+      ],
+      "id": "2baccfb9-3278-4239-80e6-7defc9a2c3ec",
+      "name": "If1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Please extract all items and their prices from this image: {{ $('Telegram Trigger2').item.binary.data.data }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert SME Accountant in Nigeria. Look at the attached image of a handwritten ledger. Extract all sales entries into a structured JSON list. For each entry, provide: 'Item', 'Quantity', and 'Amount'. If the handwriting is messy, do not create or invent words, only read items visible in the image, if a value is unclear write \"unclear\". Only return the JSON array. Do not include markdown code blocks or any introductory text. Extract the data into a JSON list. Only extract data you can see with 100% certainty. If a value is unclear, write 'MISSING', do not guess."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1168,
+        448
+      ],
+      "id": "567a17d8-90eb-46ef-9729-c8a4a1025207",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        736
+      ],
+      "id": "e336ada7-1c68-471a-b7ea-4d7b9cadf236",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "QBSWL32NWKT8Dq4r",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2a81a63d-39a4-4565-927a-a48eebf5145b",
+              "leftValue": "={{ $json.callback_query.data }}",
+              "rightValue": "lang_pidgin",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        1424
+      ],
+      "id": "a6f404ac-4f03-4061-998a-96b2b8da859e",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 35518771,
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE/edit#gid=35518771"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Chat ID": "={{ $json.callback_query.from.id }}",
+            "Language": "={{ $(\"If2\").item.json.Language === 'Pidgin' ? 'Pidgin' : 'English' }}"
+          },
+          "matchingColumns": [
+            "Chat ID"
+          ],
+          "schema": [
+            {
+              "id": "Chat ID",
+              "displayName": "Chat ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Language",
+              "displayName": "Language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        1424
+      ],
+      "id": "d2f18710-6199-43e0-80aa-e84145d83472",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "22aoX0pIQ8VTXQd6",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse(items[0].json.output)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        464
+      ],
+      "id": "e4af3ed2-35b7-494e-894e-38f9d3c69d9e",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "first"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Item": "={{ $json.Item }}",
+            "Quantity": "={{ $json.Quantity }}",
+            "Amount": "={{ $json.Amount }}",
+            "Date": "={{ $json.Date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Item",
+              "displayName": "Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1856,
+        464
+      ],
+      "id": "3379b418-7b04-4aef-a193-158cef484ca1",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "22aoX0pIQ8VTXQd6",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here are the sales I just recorded:{{ $json.allRows }}. Now check the history and give me the advice.",
+        "options": {
+          "systemMessage": "You are \"Oga/Madam Coach,\" a savvy Nigerian business mentor for SMEs. Your goal is to analyze daily sales data against historical trends to provide actionable, encouraging, and culturally relevant business advice.\n\n### YOUR DATA INPUTS:\n1. TODAY_SALES: The data extracted from the current notebook photo.\n2. HISTORY: The last 10-20 records from the Google Sheet.\n3. USER_PREFERENCE: The user's preferred language (English or Nigerian Pidgin).\n\n### YOUR CORE TASKS:\n1. TREND SPOTTING: Compare today's sales to history. Identify one \"Fast Mover\" (selling well) and one \"Slow Mover\" (needs attention).\n2. STOCK ALERTS: If a high-volume item hasn't appeared in today's sales, ask if it's out of stock.\n3. DEBT TRACKER: If the data mentions \"Credit\" or \"Owe,\" remind the vendor to follow up.\n4. GROWTH ADVICE: Give one tip to increase profit (e.g., \"People are buying bread, maybe sell butter too?\").\n\n### TONE & LANGUAGE RULES:\n- If USER_PREFERENCE is 'Pidgin', use authentic Nigerian Pidgin. Be warm, relatable, and sharp (e.g., \"Abeg,\" \"E go better,\" \"Market move\"). \n- Avoid robotic \"AI-speak.\" Talk like a successful shop owner giving advice to a friend.\n- Keep the response short (max 3-4 bullet points) so it's easy to read on a phone screen.\n\n### OUTPUT FORMAT:\n- Start with a quick greeting.\n- Use emojis for visual cues (📈 for growth, ⚠️ for warnings, 💰 for money).\n- End with a word of encouragement."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2240,
+        544
+      ],
+      "id": "50e7b068-efdc-4749-9eff-3a1b7e1a383f",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        880
+      ],
+      "id": "70239f90-55d7-48bb-bebc-d802813c0e38",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "pm1WJfaCHtkp6o5E",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Br8QYGG-kB6Qrt98c2yFH9XVyIX_ThSH8frobuWHTVE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "first",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2352,
+        944
+      ],
+      "id": "46e32659-cd9e-4716-b050-c83682c514fd",
+      "name": "Get row(s) in sheet in Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "22aoX0pIQ8VTXQd6",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5214968346",
+        "text": "={{ $json.cleanMessage }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2816,
+        576
+      ],
+      "id": "3bb52cc6-bc61-44e1-917a-0ecd073937d1",
+      "name": "Send a text message2",
+      "webhookId": "91d201f3-c22a-4705-93a6-0c80ca62b456",
+      "credentials": {
+        "telegramApi": {
+          "id": "EMjJGAUQG0Hbgoea",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2144,
+        256
+      ],
+      "id": "9a1e55de-c36f-497f-8f8f-0a4d7f834e7d",
+      "name": "Wait1",
+      "webhookId": "e6b6b384-4db4-4ad5-ac41-e239140655f9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output || $input.first().json.text || \"\";\n\n// Clean up markdown symbols Telegram can't handle\nconst cleaned = raw\n  .replace(/\\*\\*(.*?)\\*\\*/g, '*$1*')   // convert **bold** to *bold* (Telegram style)\n  .replace(/\\\\n/g, '\\n')                // fix literal \\n into real line breaks\n  .trim();\n\nreturn [{ json: { cleanMessage: cleaned } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2624,
+        576
+      ],
+      "id": "301f5605-a80f-4a54-905b-ff783056bfbd",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all items from the Wait node\nconst rows = $input.all();\n\n// Build a readable summary string\nconst summary = rows.map(r => {\n  const d = r.json;\n  return `${d.Item || 'N/A'} | Qty: ${d.Quantity || 0} | Price: ₦${d.Amount || 0}`;\n}).join('\\n');\n\n// Return as single item for AI Agent3\nreturn [{ json: { allRows: summary, rowCount: rows.length } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        256
+      ],
+      "id": "32771c10-549e-442d-9f45-62d965c2ae28",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[$json.message.photo.length - 1].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        576
+      ],
+      "id": "d68e94cf-6715-4353-a1ca-65901f8371c9",
+      "name": "Get a file",
+      "webhookId": "bf65bfa0-471e-4bfe-ae94-e8b6669b7153",
+      "credentials": {
+        "telegramApi": {
+          "id": "EMjJGAUQG0Hbgoea",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        []
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "158b77db-d2d1-4f70-af5c-ae772fe871ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "21f05a8eb89cc29cbadb851f5dac7920ce13e4b44a7643c510fdb4dab74652e9"
+  },
+  "id": "FbbzMtkUVEnfInDD",
+  "tags": []
+}
